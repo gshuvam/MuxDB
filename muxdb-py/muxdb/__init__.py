@@ -29,6 +29,8 @@ from muxdb.errors import (
     DriverError,
     ConnectionError,
     PoolExhaustedError,
+    SecurityError,
+    BulkheadLimitExceeded,
 )
 from muxdb.shard_map import ShardMap, ShardInfo
 from muxdb.router import Router
@@ -58,6 +60,9 @@ __all__ = [
     "DriverError",
     "ConnectionError",
     "PoolExhaustedError",
+    "SecurityError",
+    "BulkheadLimitExceeded",
     # Version
     "__version__",
 ]
+

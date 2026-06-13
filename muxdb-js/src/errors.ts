@@ -147,3 +147,21 @@ export class MigrationError extends MuxDBError {
     this.destShard = opts.destShard;
   }
 }
+
+// --- Security ---
+
+export class SecurityError extends MuxDBError {
+  constructor(message: string, details: Record<string, unknown> = {}) {
+    super(message, details);
+    this.name = "SecurityError";
+  }
+}
+
+export class BulkheadLimitExceeded extends MuxDBError {
+  constructor(message: string, details: Record<string, unknown> = {}) {
+    super(message, details);
+    this.name = "BulkheadLimitExceeded";
+  }
+}
+
+

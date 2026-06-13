@@ -49,6 +49,8 @@ export {
   PoolExhaustedError,
   CircuitOpenError,
   MigrationError,
+  SecurityError,
+  BulkheadLimitExceeded,
 } from "./errors.js";
 
 // Integrations
@@ -61,3 +63,10 @@ export { MuxMikroORM } from "./integrations/mikro-orm.js";
 export { MuxConnection as MuxMongooseConnection } from "./integrations/mongoose.js";
 export { MuxIORedis } from "./integrations/ioredis.js";
 export { MuxDialect as MuxKyselyDialect } from "./integrations/kysely.js";
+
+// Enterprise Infrastructure
+export * from "./observability/index.js";
+export * from "./security/index.js";
+export * from "./resilience/index.js";
+export * from "./multitenancy/index.js";
+

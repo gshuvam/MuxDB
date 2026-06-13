@@ -169,3 +169,19 @@ class MigrationError(MuxDBError):
         if details:
             extra.update(details)
         super().__init__(message, details=extra)
+
+
+# --- Security ---
+
+
+class SecurityError(MuxDBError):
+    """Raised when security validation or authentication fails."""
+
+
+# --- Resilience ---
+
+
+class BulkheadLimitExceeded(MuxDBError):
+    """Raised when the concurrency limit (bulkhead) for a resource is exceeded."""
+
+
