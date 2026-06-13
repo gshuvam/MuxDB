@@ -63,8 +63,16 @@ export { MuxMikroORM } from "./integrations/mikro-orm.js";
 export { MuxConnection as MuxMongooseConnection } from "./integrations/mongoose.js";
 export { MuxIORedis } from "./integrations/ioredis.js";
 export { MuxDialect as MuxKyselyDialect } from "./integrations/kysely.js";
+export { MuxKafkaProducer, MuxKafkaConsumer } from "./integrations/kafka.js";
+
+// Core Phase 5 Engines
+export { TelemetryCollector } from "./telemetry.js";
+export { PlacementEngine } from "./placement.js";
+export { Balancer } from "./balancer.js";
+export type { BalancingAction } from "./balancer.js";
 
 // Enterprise Infrastructure
+
 export * from "./observability/index.js";
 export * from "./security/index.js";
 export * from "./resilience/index.js";

@@ -34,6 +34,9 @@ from muxdb.errors import (
 )
 from muxdb.shard_map import ShardMap, ShardInfo
 from muxdb.router import Router
+from muxdb.telemetry import TelemetryCollector
+from muxdb.placement import PlacementEngine
+from muxdb.balancer import Balancer, BalancingAction
 
 __version__ = "0.1.0"
 
@@ -44,8 +47,13 @@ __all__ = [
     "ShardMap",
     "ShardInfo",
     "Router",
+    "TelemetryCollector",
+    "PlacementEngine",
+    "Balancer",
+    "BalancingAction",
     # Config
     "PoolConfig",
+
     "RoutingConfig",
     "BalancerConfig",
     "TelemetryConfig",
