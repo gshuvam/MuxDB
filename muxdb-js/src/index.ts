@@ -75,11 +75,13 @@ export type { BalancingAction } from "./balancer.js";
 export { LiveMigrator, PIDController } from "./migrator.js";
 export * from "./control-plane/index.js";
 
+// ML
+export * from "./ml/index.js";
+
 // Enterprise Infrastructure
-
-
 export * from "./observability/index.js";
 export * from "./security/index.js";
 export * from "./resilience/index.js";
 export * from "./multitenancy/index.js";
+
 
