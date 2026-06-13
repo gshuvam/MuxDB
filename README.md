@@ -1,18 +1,38 @@
-# MuxDB
+# MuxDB — Autonomous Data Orchestration Platform
 
-Autonomous Data Orchestration Platform for Distributed Databases.
+Enterprise-grade database sharding, routing, and autonomic placement control plane across **Python** and **Node.js/TypeScript** ecosystems.
 
-MuxDB is an enterprise-grade, multi-language wrapper SDK (**Python** + **Node.js/TypeScript**) that sits on top of your existing databases and ORMs to provide transparent query routing, adaptive connection pooling, workload telemetry, and autonomous sharding.
+MuxDB implements the **6-layer self-optimizing database architecture** described in our [Strategy Document](file:///home/shuva/Development/Projects/MuxDB/docs/strategy.md). It sits transparently on top of existing databases (PostgreSQL, Redis, MongoDB, Qdrant) and ORMs (SQLAlchemy, Prisma, Drizzle, etc.) to manage routing, load balancing, caching, and downtime-free live migrations.
 
 ---
 
-## 🚀 Key Features
+## 🚀 The 6-Layer Architecture
 
-* **Multi-Language Equivalency:** Unified design system, configuration, and API footprint across both Python (`muxdb`) and Node.js (`muxdb`) packages.
-* **Transparent Query Routing (Layer 1):** SQL parser extracts shard keys (e.g. `user_id = 42`) and routes queries to single shards, broadcasts DDL, or scatter-gathers multi-shard read operations.
-* **Adaptive Connection Pooling:** Citus-style 10ms slow-start pool scaling per-shard with idle connection eviction and transaction pinning.
-* **Workload-Aware Placement (Layer 2):** In-memory consistent hashing with customizable virtual-node counts, range-based routing, and hash strategies.
-* **Resilient Driver Layer:** Native wrappers for PostgreSQL (`psycopg` / `pg`).
+```
+┌───────────────────────────────────────┐
+│ Layer 1: Logical Router (MuxProxy)    │
+├───────────────────────────────────────┤
+│ Layer 2: Dynamic Placement (E-Store)  │
+├───────────────────────────────────────┤
+│ Layer 3: Load Balancer (Slicer)       │
+├───────────────────────────────────────┤
+│ Layer 4: Live Migrator (Zephyr)       │
+├───────────────────────────────────────┤
+│ Layer 5: ML Control Plane (P-Store)   │
+├───────────────────────────────────────┤
+│ Layer 6: Evaluation Harness (Chaos)   │
+└───────────────────────────────────────┘
+```
+
+1.  **Logical Router (Layer 1):** Best-effort SQL shard key extraction, single-shard routing, transaction pinning, and parallel scatter-gather query aggregation.
+2.  **Dynamic Placement (Layer 2):** Two-tier caching (Redis L2 cache + SQL persistent shard) dynamically promoting read-hot keys and invalidating cached items on write.
+3.  **Load Balancer (Layer 3):** Monitors real-time telemetry to trigger L2 key range splits, L3 replica resizes, or lease transfers, enforcing cooldowns and write-load suppression rules.
+4.  **Live Migrator (Layer 4):** Zephyr dual-mode replication: pulls requested keys on-demand in-flight to prevent downtime, while pushing cold keys in background batches regulated by a PID Controller.
+5.  **ML Control Plane (Layer 5):**
+    *   **Workload Predictor (P-Store):** Diurnal/cyclical time-series forecasting (Holt-Winters) recommending proactive scaling before spikes hit.
+    *   **Bandit Solver (AW-CUCB-DP):** Contextual Multi-Armed Bandit with a Page-Hinkley Change Detector to reset or decay weights on workload shifts.
+    *   **Knob Auto-Tuner (QTune/UDO):** Reinforcement Learning DQN agent implemented in pure Python to tune database configs.
+6.  **Evaluation Harness (Layer 6):** Event-driven simulator validating cluster performance under stable, hotspot, and diurnal workloads combined with scheduled node failures or slowdowns.
 
 ---
 
@@ -20,118 +40,70 @@ MuxDB is an enterprise-grade, multi-language wrapper SDK (**Python** + **Node.js
 
 ```text
 MuxDB/
-├── docs/                      # Architectural designs and research reports
-├── muxdb-py/                  # Python SDK package
-│   ├── muxdb/                 # Core Python source modules
-│   └── pyproject.toml         # Python packaging config
-├── muxdb-js/                  # Node.js/TypeScript SDK package
-│   ├── src/                   # TypeScript source modules
-│   ├── tsconfig.json          # TS compilation options
+├── docs/                      # Strategy and deep research documents
+├── deploy/                    # Kubernetes Helm charts, Dockerfiles, and Terraform VPC plans
+├── .github/workflows/         # Actions workflows (CI matrix, tagged releases, security audits)
+├── muxdb-py/                  # Python SDK
+│   ├── muxdb/                 # Core, ML, Evaluator, and integrations module
+│   └── pyproject.toml         # pyproject.toml package configuration
+├── muxdb-js/                  # Node.js/TypeScript SDK
+│   ├── src/                   # Core TypeScript sources
 │   └── package.json           # npm packaging config
-├── muxdb.schema.yaml          # Canonical configuration schema
-└── README.md                  # Project overview (this file)
+├── muxdb-cli/                 # Click-based administration Python CLI
+└── muxdb-dashboard/           # Next.js administrative dashboard app
 ```
 
 ---
 
 ## 📦 Installation
 
-For development, you can install the SDK packages locally:
-
-### Python
+### Python SDK
 Ensure you are in a virtual environment (`.venv`), then install:
 ```bash
-uv pip install -e ./muxdb-py/
+cd muxdb-py
+uv pip install -e ".[all,dev]"
 ```
 
-### Node.js / TypeScript
-Build the package and link or install it:
+### Node.js / TypeScript SDK
+Build and transpile the package:
 ```bash
 cd muxdb-js
-npm install
+npm ci
 npm run build
 ```
 
 ---
 
-## ⚡ Quick Start
+## 🖥️ Operations: CLI & Admin Dashboard
 
-### 1. Define Cluster Configuration (`muxdb.yaml`)
+### Python CLI
+MuxDB includes a terminal-friendly management CLI powered by `rich` layout rendering:
+```bash
+# Register MuxDB CLI in path
+cd muxdb-cli
+uv pip install -e . --python ../muxdb-py/.venv/bin/python
 
-```yaml
-cluster:
-  name: "production-cluster"
-  strategy: "consistent_hash"
-  shard_key: "user_id"
-  virtual_nodes: 256
+# Validate configuration
+muxdb validate --config muxdb.yaml
 
-shards:
-  - id: "shard-0"
-    backend: "postgresql"
-    host: "localhost"
-    port: 5432
-    database: "orders_shard_0"
-  - id: "shard-1"
-    backend: "postgresql"
-    host: "localhost"
-    port: 5433
-    database: "orders_shard_1"
+# Check cluster health
+muxdb status --config muxdb.yaml
 
-pool:
-  min_size: 2
-  max_size: 10
-  slow_start_ms: 10
+# Trigger key range migration
+muxdb migrate --config muxdb.yaml --id mig-202 --source shard-0 --dest shard-1 --keys user_10,user_12
 ```
 
-### 2. Usage in Python
-
-```python
-from muxdb import MuxDB, MuxConfig
-
-# Load cluster configurations
-config = MuxConfig.from_file("muxdb.yaml")
-db = MuxDB(config)
-
-# Connect to all shards and open connection pools
-db.connect()
-
-try:
-    # 1. Single-shard query routed transparently by user_id
-    result = db.execute("SELECT * FROM orders WHERE user_id = 42")
-    print(f"Routed to: {result.shard_id}")
-    for row in result.rows:
-        print(row)
-
-    # 2. Scatter-gather query executing in parallel across all shards
-    summary = db.execute("SELECT COUNT(*) FROM orders")
-    print(f"Total rows count: {summary.scalar}")
-finally:
-    db.close()
+### Next.js Admin Dashboard
+Visual React interface displaying cluster topology state:
+```bash
+# Run Next.js dashboard
+cd muxdb-dashboard
+npm install
+npm run build
+npm run dev
 ```
-
-### 3. Usage in Node.js / TypeScript
-
-```typescript
-import { MuxDB, MuxConfig } from "muxdb";
-
-// Load configurations
-const config = MuxConfig.fromFile("muxdb.yaml");
-const db = new MuxDB(config);
-
-await db.connect();
-
-try {
-  // 1. Single-shard query routed by user_id
-  const result = await db.execute("SELECT * FROM orders WHERE user_id = 42");
-  console.log(`Routed to shard: ${result.shardId}`);
-  
-  // 2. Parallel scatter-gather execution
-  const summary = await db.execute("SELECT COUNT(*) FROM orders");
-  console.log(`Total count: ${summary.rows[0]?.count}`);
-} finally {
-  await db.close();
-}
-```
+*   **Visualizations:** Interactive health status indicators (healthy, slow, failed), real-time QPS, latency gauges, and live Zephyr migration progress trackers.
+*   **Controls:** Live buttons to trigger simulated failures (`FAIL_NODE`), node slow states (`SLOW_NODE`), or register new database nodes (`ADD_NODE`).
 
 ---
 

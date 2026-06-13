@@ -1,0 +1,6 @@
+apiVersion: v2
+name: muxdb-control-plane
+description: Kubernetes Helm chart for MuxDB database orchestration plane
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

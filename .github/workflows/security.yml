@@ -1,0 +1,38 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Runs every Monday at midnight
+  push:
+    branches: [ main ]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Python SAST Code Scan & Dependency Audit
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Run Python Security Audits
+        run: |
+          pip install --no-cache-dir bandit pip-audit
+          # Run Bandit SAST scan on python codebase
+          bandit -r muxdb-py/muxdb/
+          # Run Dependency vulnerability audit
+          pip-audit --requirements muxdb-py/pyproject.toml || true
+
+      # Node.js Dependency vulnerability audit
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Run Node.js security audits
+        run: |
+          cd muxdb-js
+          npm audit --audit-level=high || true

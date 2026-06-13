@@ -1,0 +1,20 @@
+site_name: MuxDB Documentation
+site_url: https://docs.muxdb.dev
+repo_name: gshuvam/MuxDB
+repo_url: https://github.com/gshuvam/MuxDB
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+
+nav:
+  - Welcome: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - CLI & Dashboard: cli-dashboard.md

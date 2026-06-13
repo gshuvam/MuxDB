@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies and build requirements
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy python SDK source code
+COPY muxdb-py/ /app/muxdb-py/
+WORKDIR /app/muxdb-py
+
+# Install local package along with extras
+RUN pip install --no-cache-dir -e ".[all]"
+
+# Entry point starts the control plane daemon
+CMD ["python", "-c", "import asyncio; from muxdb.control_plane.grpc_server import ControlPlaneGRPCServer; server = ControlPlaneGRPCServer('node-0'); server.start(port=50051); print('gRPC Control Plane running on port 50051'); asyncio.get_event_loop().run_forever()"]

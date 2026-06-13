@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # Shard 0 Database
+  postgres-shard-0:
+    image: postgres:15-alpine
+    container_name: muxdb-postgres-shard-0
+    environment:
+      POSTGRES_USER: muxuser
+      POSTGRES_PASSWORD: muxpassword
+      POSTGRES_DB: db_shard_0
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-shard-0-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muxuser -d db_shard_0"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Shard 1 Database
+  postgres-shard-1:
+    image: postgres:15-alpine
+    container_name: muxdb-postgres-shard-1
+    environment:
+      POSTGRES_USER: muxuser
+      POSTGRES_PASSWORD: muxpassword
+      POSTGRES_DB: db_shard_1
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg-shard-1-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muxuser -d db_shard_1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # L2 Redis Cache Tier
+  redis-cache:
+    image: redis:7-alpine
+    container_name: muxdb-redis-cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # CDC Message Broker
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: muxdb-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: muxdb-kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  # MuxDB Control Plane Daemon (gRPC)
+  control-plane:
+    build:
+      context: ../
+      dockerfile: deploy/docker/Dockerfile.control-plane
+    container_name: muxdb-control-plane
+    ports:
+      - "50051:50051"
+    environment:
+      - MUXDB_NODE_ID=node-0
+      - MUXDB_CONFIG_PATH=/etc/muxdb/muxdb.yaml
+    volumes:
+      - ../muxdb.schema.yaml:/etc/muxdb/muxdb.schema.yaml
+      - ../muxdb.yaml:/etc/muxdb/muxdb.yaml
+    depends_on:
+      postgres-shard-0:
+        condition: service_healthy
+      postgres-shard-1:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+
+  # MuxDB Admin Dashboard Frontend
+  dashboard:
+    build:
+      context: ../
+      dockerfile: deploy/docker/Dockerfile.dashboard
+    container_name: muxdb-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - control-plane
+
+volumes:
+  pg-shard-0-data:
+  pg-shard-1-data:

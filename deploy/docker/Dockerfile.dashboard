@@ -1,0 +1,29 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy dependency core packages
+COPY muxdb-js /app/muxdb-js
+WORKDIR /app/muxdb-js
+RUN npm ci && npm run build
+
+# Copy and build Next.js dashboard
+WORKDIR /app/muxdb-dashboard
+COPY muxdb-dashboard/package.json ./
+RUN npm install
+
+COPY muxdb-dashboard/ ./
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/muxdb-dashboard/.next/standalone ./
+COPY --from=builder /app/muxdb-dashboard/.next/static ./.next/static
+COPY --from=builder /app/muxdb-dashboard/public ./public
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

@@ -1,0 +1,58 @@
+name: Release and Publish Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  # Publish Python Package to PyPI
+  pypi-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install hatch and build wheel
+        run: |
+          cd muxdb-py
+          pip install --upgrade pip
+          pip install hatchling
+          python -m pip install --upgrade build
+          python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: muxdb-py/dist/
+
+  # Publish Node.js Package to NPM
+  npm-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies & build
+        run: |
+          cd muxdb-js
+          npm ci
+          npm run build
+
+      - name: Publish to NPM
+        run: |
+          cd muxdb-js
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

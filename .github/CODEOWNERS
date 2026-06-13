@@ -1,0 +1,8 @@
+# Global owners
+*       @gshuvam @muxdb-core-maintainers
+
+# Python SDK specific files
+/muxdb-py/    @gshuvam @python-maintainers
+
+# Node.js SDK specific files
+/muxdb-js/    @gshuvam @nodejs-maintainers

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "muxdb.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "muxdb.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "muxdb.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "muxdb.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: grpc
+              containerPort: 50051
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: MUXDB_CONFIG_PATH
+              value: "/etc/muxdb/muxdb.yaml"
+            - name: MUXDB_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "muxdb.fullname" . }}-config
+data:
+  muxdb.yaml: |
+    cluster:
+      name: k8s_production
+      strategy: {{ .Values.config.strategy | quote }}
+      shard_key: {{ .Values.config.shardKey | quote }}
+      virtual_nodes: {{ .Values.config.virtualNodes }}
+    shards: []

@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy python SDK and CLI source code
+COPY muxdb-py/ /app/muxdb-py/
+COPY muxdb-cli/ /app/muxdb-cli/
+
+# Install dependencies and local packages
+RUN pip install --no-cache-dir -e "/app/muxdb-py[all]"
+RUN pip install --no-cache-dir -e "/app/muxdb-cli"
+
+ENTRYPOINT ["muxdb"]

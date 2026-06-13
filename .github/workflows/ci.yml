@@ -1,0 +1,60 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  # Test Python Package
+  python-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          cd muxdb-py
+          uv pip install -e ".[all,dev]" --system
+
+      - name: Run pytest
+        run: |
+          cd muxdb-py
+          pytest --cov=muxdb --cov-report=xml
+
+  # Test Node.js Package
+  node-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Node.js dependencies & Build
+        run: |
+          cd muxdb-js
+          npm ci
+          npm run build
+
+      - name: Run Vitest tests
+        run: |
+          cd muxdb-js
+          npx vitest run
