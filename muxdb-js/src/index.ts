@@ -71,7 +71,12 @@ export { PlacementEngine } from "./placement.js";
 export { Balancer } from "./balancer.js";
 export type { BalancingAction } from "./balancer.js";
 
+// Core Phase 6 Engines
+export { LiveMigrator, PIDController } from "./migrator.js";
+export * from "./control-plane/index.js";
+
 // Enterprise Infrastructure
+
 
 export * from "./observability/index.js";
 export * from "./security/index.js";
