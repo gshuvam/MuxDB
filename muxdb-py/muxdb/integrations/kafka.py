@@ -7,14 +7,22 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-# Attempt to load confluent_kafka, fallback to mock if unavailable
-try:
-    from confluent_kafka import Consumer, Producer
-    HAS_KAFKA = True
-except ImportError:
+import os
+
+# Attempt to load confluent_kafka, fallback to mock if unavailable or explicitly mocked
+if os.environ.get("MUXDB_MOCK_KAFKA") == "true":
     HAS_KAFKA = False
     Producer = Any
     Consumer = Any
+else:
+    try:
+        from confluent_kafka import Consumer, Producer
+        HAS_KAFKA = True
+    except ImportError:
+        HAS_KAFKA = False
+        Producer = Any
+        Consumer = Any
+
 
 class MuxKafkaProducer:
     """Producer that routes CDC partition messages in alignment with MuxDB shard maps."""

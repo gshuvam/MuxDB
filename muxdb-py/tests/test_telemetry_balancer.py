@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import os
+os.environ["MUXDB_MOCK_KAFKA"] = "true"
+
 import time
 import unittest
 from unittest.mock import MagicMock
+
 
 from muxdb.config import MuxConfig, ClusterConfig, ShardConfig
 from muxdb import (
