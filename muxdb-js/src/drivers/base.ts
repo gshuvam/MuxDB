@@ -5,7 +5,7 @@
  * router and pool to work identically regardless of database technology.
  */
 
-import type { ShardInfo } from "./shard-map.js";
+import type { ShardInfo } from "../shard-map.js";
 
 export interface QueryResult {
   rows: Record<string, unknown>[];

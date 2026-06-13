@@ -23,5 +23,6 @@ export default defineConfig({
     "mongoose",
     "ioredis",
     "kysely",
+    "reflect-metadata",
   ],
 });

@@ -18,7 +18,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": false,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]

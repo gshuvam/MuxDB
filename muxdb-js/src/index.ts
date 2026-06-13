@@ -50,3 +50,9 @@ export {
   CircuitOpenError,
   MigrationError,
 } from "./errors.js";
+
+// Integrations
+export { createMuxPrisma } from "./integrations/prisma.js";
+export { createMuxDrizzle } from "./integrations/drizzle.js";
+export { MuxDataSource, ShardKey } from "./integrations/typeorm.js";
+export { createMuxKnex } from "./integrations/knex.js";

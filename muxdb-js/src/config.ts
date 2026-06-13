@@ -127,6 +127,24 @@ export interface SecurityConfig {
 // MuxConfig
 // ---------------------------------------------------------------------------
 
+export interface MuxConfigOptions {
+  cluster: ClusterConfig;
+  shards: ShardConfig[];
+  pool?: Partial<PoolConfig>;
+  routing?: Partial<RoutingConfig>;
+  balancer?: Partial<BalancerConfig>;
+  telemetry?: {
+    enabled?: boolean;
+    windowSizeS?: number;
+    hotKeyThresholdPct?: number;
+    export?: Partial<TelemetryExportConfig>;
+  };
+  security?: {
+    tls?: Partial<SecurityTLSConfig>;
+    auth?: Partial<SecurityAuthConfig>;
+  };
+}
+
 export class MuxConfig {
   readonly cluster: ClusterConfig;
   readonly shards: readonly ShardConfig[];
@@ -136,15 +154,7 @@ export class MuxConfig {
   readonly telemetry: TelemetryConfig;
   readonly security: SecurityConfig;
 
-  constructor(opts: {
-    cluster: ClusterConfig;
-    shards: ShardConfig[];
-    pool?: Partial<PoolConfig>;
-    routing?: Partial<RoutingConfig>;
-    balancer?: Partial<BalancerConfig>;
-    telemetry?: Partial<TelemetryConfig>;
-    security?: Partial<SecurityConfig>;
-  }) {
+  constructor(opts: MuxConfigOptions) {
     this.cluster = opts.cluster;
     this.shards = Object.freeze([...opts.shards]);
 
@@ -176,21 +186,21 @@ export class MuxConfig {
       windowSizeS: opts.telemetry?.windowSizeS ?? 60,
       hotKeyThresholdPct: opts.telemetry?.hotKeyThresholdPct ?? 1.0,
       export: {
-        type: (opts.telemetry?.export as TelemetryExportConfig | undefined)?.type ?? "memory",
-        endpoint: (opts.telemetry?.export as TelemetryExportConfig | undefined)?.endpoint,
+        type: opts.telemetry?.export?.type ?? "memory",
+        endpoint: opts.telemetry?.export?.endpoint,
       },
     };
 
     this.security = {
       tls: {
-        enabled: (opts.security?.tls as SecurityTLSConfig | undefined)?.enabled ?? false,
-        certFile: (opts.security?.tls as SecurityTLSConfig | undefined)?.certFile,
-        keyFile: (opts.security?.tls as SecurityTLSConfig | undefined)?.keyFile,
-        caFile: (opts.security?.tls as SecurityTLSConfig | undefined)?.caFile,
+        enabled: opts.security?.tls?.enabled ?? false,
+        certFile: opts.security?.tls?.certFile,
+        keyFile: opts.security?.tls?.keyFile,
+        caFile: opts.security?.tls?.caFile,
       },
       auth: {
-        type: (opts.security?.auth as SecurityAuthConfig | undefined)?.type ?? "none",
-        token: (opts.security?.auth as SecurityAuthConfig | undefined)?.token,
+        type: opts.security?.auth?.type ?? "none",
+        token: opts.security?.auth?.token,
       },
     };
 

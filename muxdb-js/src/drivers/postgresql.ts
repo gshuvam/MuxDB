@@ -25,7 +25,7 @@ export class PostgreSQLDriver implements Driver {
       });
 
       await client.connect();
-      (client as Record<string, unknown>)["_muxdb_shard_id"] = shard.id;
+      (client as any)["_muxdb_shard_id"] = shard.id;
       return client;
     } catch (err) {
       if ((err as Error).message?.includes("Cannot find module")) {
@@ -52,7 +52,7 @@ export class PostgreSQLDriver implements Driver {
   async execute(connection: unknown, query: string, params: unknown[] = []): Promise<QueryResult> {
     const t0 = performance.now();
     const shardId =
-      ((connection as Record<string, unknown>)["_muxdb_shard_id"] as string) ?? "unknown";
+      ((connection as any)["_muxdb_shard_id"] as string) ?? "unknown";
 
     try {
       const client = connection as { query(q: string, p?: unknown[]): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null; fields: Array<{ name: string }> }> };
