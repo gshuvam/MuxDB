@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+  --background: #030712;
+  --foreground: #f3f4f6;
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-purple: #8b5cf6;
+  --accent-red: #ef4444;
+  --accent-yellow: #f59e0b;
+  --text-muted: #9ca3af;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glass panel styling */
+.glass-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Header styling */
+header {
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(3, 7, 18, 0.8);
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Main Dashboard layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  padding: 32px 40px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.col-12 { grid-column: span 12; }
+.col-8 { grid-column: span 8; }
+.col-6 { grid-column: span 6; }
+.col-4 { grid-column: span 4; }
+
+@media (max-width: 1024px) {
+  .col-8, .col-6, .col-4 {
+    grid-column: span 12;
+  }
+}
+
+/* Interactive elements */
+button {
+  font-family: var(--font-sans);
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--foreground);
+}
+
+button.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+input, select {
+  font-family: var(--font-sans);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent-blue);
+}
+
+/* Shard Grid styling */
+.shard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.shard-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.shard-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.shard-card.healthy { border-left: 4px solid var(--accent-green); }
+.shard-card.slow { border-left: 4px solid var(--accent-yellow); }
+.shard-card.failed { border-left: 4px solid var(--accent-red); }
+
+/* Progress bar */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  transition: width 0.3s ease;
+}
+
+/* Heatmap simulation dots */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.green { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+.dot.yellow { background-color: var(--accent-yellow); box-shadow: 0 0 8px var(--accent-yellow); }
+.dot.red { background-color: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
