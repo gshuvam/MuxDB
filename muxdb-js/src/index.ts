@@ -78,10 +78,14 @@ export * from "./control-plane/index.js";
 // ML
 export * from "./ml/index.js";
 
+// Evaluator
+export * from "./evaluator/index.js";
+
 // Enterprise Infrastructure
 export * from "./observability/index.js";
 export * from "./security/index.js";
 export * from "./resilience/index.js";
 export * from "./multitenancy/index.js";
+
 
 

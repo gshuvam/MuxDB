@@ -37,7 +37,9 @@ from muxdb.router import Router
 from muxdb.telemetry import TelemetryCollector
 from muxdb.placement import PlacementEngine
 from muxdb.balancer import Balancer, BalancingAction
+
 from muxdb.ml import WorkloadPredictor, BanditSolver, DRLTuner, SyntheticGenerator
+from muxdb.evaluator import ClusterChangeEvent, WorkloadScenario, SimulationRunner, compare_policies
 
 __version__ = "0.1.0"
 
@@ -57,6 +59,11 @@ __all__ = [
     "BanditSolver",
     "DRLTuner",
     "SyntheticGenerator",
+    # Evaluator
+    "ClusterChangeEvent",
+    "WorkloadScenario",
+    "SimulationRunner",
+    "compare_policies",
     # Config
     "PoolConfig",
     "RoutingConfig",
@@ -78,5 +85,6 @@ __all__ = [
     # Version
     "__version__",
 ]
+
 
 
