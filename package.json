@@ -1,0 +1,44 @@
+{
+  "name": "muxdb",
+  "version": "0.1.0",
+  "description": "Autonomous data orchestration SDK for distributed databases",
+  "type": "module",
+  "main": "./muxdb-js/dist/index.cjs",
+  "module": "./muxdb-js/dist/index.js",
+  "types": "./muxdb-js/dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./muxdb-js/dist/index.js",
+      "require": "./muxdb-js/dist/index.cjs",
+      "types": "./muxdb-js/dist/index.d.ts"
+    },
+    "./integrations/prisma": {
+      "import": "./muxdb-js/dist/integrations/prisma.js",
+      "require": "./muxdb-js/dist/integrations/prisma.cjs",
+      "types": "./muxdb-js/dist/integrations/prisma.d.ts"
+    },
+    "./integrations/drizzle": {
+      "import": "./muxdb-js/dist/integrations/drizzle.js",
+      "require": "./muxdb-js/dist/integrations/drizzle.cjs",
+      "types": "./muxdb-js/dist/integrations/drizzle.d.ts"
+    },
+    "./integrations/knex": {
+      "import": "./muxdb-js/dist/integrations/knex.js",
+      "require": "./muxdb-js/dist/integrations/knex.cjs",
+      "types": "./muxdb-js/dist/integrations/knex.d.ts"
+    },
+    "./integrations/typeorm": {
+      "import": "./muxdb-js/dist/integrations/typeorm.js",
+      "require": "./muxdb-js/dist/integrations/typeorm.cjs",
+      "types": "./muxdb-js/dist/integrations/typeorm.d.ts"
+    }
+  },
+  "scripts": {
+    "prepare": "npm install --prefix muxdb-js && npm run build --prefix muxdb-js"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "js-yaml": "^4.1.0",
+    "pino": "^9.0.0"
+  }
+}
