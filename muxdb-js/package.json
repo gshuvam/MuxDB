@@ -1,0 +1,106 @@
+{
+  "name": "muxdb",
+  "version": "0.1.0",
+  "description": "Autonomous data orchestration SDK for distributed databases",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./integrations/prisma": {
+      "import": "./dist/integrations/prisma.js",
+      "require": "./dist/integrations/prisma.cjs",
+      "types": "./dist/integrations/prisma.d.ts"
+    },
+    "./integrations/drizzle": {
+      "import": "./dist/integrations/drizzle.js",
+      "require": "./dist/integrations/drizzle.cjs",
+      "types": "./dist/integrations/drizzle.d.ts"
+    },
+    "./integrations/knex": {
+      "import": "./dist/integrations/knex.js",
+      "require": "./dist/integrations/knex.cjs",
+      "types": "./dist/integrations/knex.d.ts"
+    },
+    "./integrations/typeorm": {
+      "import": "./dist/integrations/typeorm.js",
+      "require": "./dist/integrations/typeorm.cjs",
+      "types": "./dist/integrations/typeorm.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "database",
+    "distributed",
+    "sharding",
+    "orchestration",
+    "load-balancing",
+    "auto-scaling",
+    "prisma",
+    "drizzle",
+    "typeorm",
+    "knex"
+  ],
+  "author": "MuxDB Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gshuvam/MuxDB"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "pino": "^9.0.0"
+  },
+  "peerDependencies": {
+    "pg": ">=8.11.0",
+    "@prisma/client": ">=5.0.0",
+    "drizzle-orm": ">=0.29.0",
+    "knex": ">=3.0.0",
+    "typeorm": ">=0.3.0",
+    "sequelize": ">=6.0.0",
+    "@mikro-orm/core": ">=6.0.0",
+    "mongoose": ">=8.0.0",
+    "ioredis": ">=5.0.0",
+    "kysely": ">=0.27.0"
+  },
+  "peerDependenciesMeta": {
+    "pg": { "optional": true },
+    "@prisma/client": { "optional": true },
+    "drizzle-orm": { "optional": true },
+    "knex": { "optional": true },
+    "typeorm": { "optional": true },
+    "sequelize": { "optional": true },
+    "@mikro-orm/core": { "optional": true },
+    "mongoose": { "optional": true },
+    "ioredis": { "optional": true },
+    "kysely": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "@types/pg": "^8.11.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  }
+}

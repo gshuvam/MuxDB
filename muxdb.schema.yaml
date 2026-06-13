@@ -1,0 +1,191 @@
+# MuxDB Configuration Schema
+# This file defines the canonical configuration format for MuxDB.
+# Both Python and Node.js SDKs consume this format.
+
+# Example configuration:
+#
+# cluster:
+#   name: "my-cluster"
+#   strategy: "hash"          # hash | range | consistent_hash
+#   shard_key: "user_id"      # default shard key column/field
+#
+# shards:
+#   - id: "shard_0"
+#     backend: "postgresql"
+#     host: "db-node-1.example.com"
+#     port: 5432
+#     database: "mydb_0"
+#     weight: 1
+#     range:                   # only for range strategy
+#       start: 0
+#       end: 999999
+#
+#   - id: "shard_1"
+#     backend: "postgresql"
+#     host: "db-node-2.example.com"
+#     port: 5432
+#     database: "mydb_1"
+#     weight: 1
+#     range:
+#       start: 1000000
+#       end: 1999999
+#
+# pool:
+#   min_size: 2
+#   max_size: 20
+#   slow_start_ms: 10          # Citus-style 10ms slow-start
+#   idle_timeout_s: 300
+#   health_check_interval_s: 30
+#
+# routing:
+#   scatter_gather: true       # allow cross-shard queries
+#   read_preference: "primary" # primary | replica | nearest
+#   retry_on_shard_error: true
+#
+# balancer:
+#   enabled: true
+#   check_interval_s: 60
+#   suppression_threshold: 0.25  # suppress if max load < 25%
+#   qps_split_threshold: 5000
+#   balance_factor_min: 0.3
+#   split_crossing_penalty_max: 0.1
+#
+# telemetry:
+#   enabled: true
+#   window_size_s: 60
+#   hot_key_threshold_pct: 1.0   # top 1% = hot
+#   export:
+#     type: "prometheus"         # prometheus | log | memory
+#     endpoint: "http://localhost:9090"
+#
+# security:
+#   tls:
+#     enabled: false
+#     cert_file: ""
+#     key_file: ""
+#     ca_file: ""
+#   auth:
+#     type: "none"               # none | token | jwt
+#     token: "${MUXDB_AUTH_TOKEN}"
+#
+# credentials:
+#   username: "${DB_USERNAME}"
+#   password: "${DB_PASSWORD}"
+
+---
+# Schema definition (for validation)
+type: object
+required:
+  - cluster
+  - shards
+properties:
+  cluster:
+    type: object
+    required: [name, strategy]
+    properties:
+      name:
+        type: string
+        description: "Unique cluster identifier"
+      strategy:
+        type: string
+        enum: [hash, range, consistent_hash]
+        description: "Shard routing strategy"
+      shard_key:
+        type: string
+        description: "Default column/field used for shard routing"
+      virtual_nodes:
+        type: integer
+        default: 256
+        description: "Virtual nodes per shard for consistent hashing"
+
+  shards:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [id, backend, host, port, database]
+      properties:
+        id:
+          type: string
+          description: "Unique shard identifier"
+        backend:
+          type: string
+          enum: [postgresql, mongodb, redis, qdrant, elasticsearch, cassandra]
+        host:
+          type: string
+        port:
+          type: integer
+        database:
+          type: string
+        weight:
+          type: integer
+          default: 1
+          description: "Relative weight for load distribution"
+        range:
+          type: object
+          properties:
+            start: { type: integer }
+            end: { type: integer }
+        tags:
+          type: object
+          description: "Arbitrary key-value tags for placement policies"
+
+  pool:
+    type: object
+    properties:
+      min_size: { type: integer, default: 2 }
+      max_size: { type: integer, default: 20 }
+      slow_start_ms: { type: integer, default: 10 }
+      idle_timeout_s: { type: integer, default: 300 }
+      health_check_interval_s: { type: integer, default: 30 }
+
+  routing:
+    type: object
+    properties:
+      scatter_gather: { type: boolean, default: true }
+      read_preference: { type: string, enum: [primary, replica, nearest], default: primary }
+      retry_on_shard_error: { type: boolean, default: true }
+
+  balancer:
+    type: object
+    properties:
+      enabled: { type: boolean, default: true }
+      check_interval_s: { type: integer, default: 60 }
+      suppression_threshold: { type: number, default: 0.25 }
+      qps_split_threshold: { type: integer, default: 5000 }
+      balance_factor_min: { type: number, default: 0.3 }
+      split_crossing_penalty_max: { type: number, default: 0.1 }
+
+  telemetry:
+    type: object
+    properties:
+      enabled: { type: boolean, default: true }
+      window_size_s: { type: integer, default: 60 }
+      hot_key_threshold_pct: { type: number, default: 1.0 }
+      export:
+        type: object
+        properties:
+          type: { type: string, enum: [prometheus, log, memory], default: memory }
+          endpoint: { type: string }
+
+  security:
+    type: object
+    properties:
+      tls:
+        type: object
+        properties:
+          enabled: { type: boolean, default: false }
+          cert_file: { type: string }
+          key_file: { type: string }
+          ca_file: { type: string }
+      auth:
+        type: object
+        properties:
+          type: { type: string, enum: [none, token, jwt], default: none }
+          token: { type: string }
+
+  credentials:
+    type: object
+    properties:
+      username: { type: string }
+      password: { type: string }

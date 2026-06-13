@@ -1,0 +1,107 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "muxdb"
+version = "0.1.0"
+description = "Autonomous data orchestration SDK for distributed databases"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "MuxDB Contributors" },
+]
+keywords = [
+    "database",
+    "distributed",
+    "sharding",
+    "orchestration",
+    "load-balancing",
+    "auto-scaling",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "structlog>=24.0",
+]
+
+[project.optional-dependencies]
+psycopg = ["psycopg[binary]>=3.1"]
+asyncpg = ["asyncpg>=0.29"]
+sqlalchemy = ["sqlalchemy>=2.0"]
+django = ["django>=4.2"]
+sqlmodel = ["sqlmodel>=0.0.16", "sqlalchemy>=2.0"]
+qdrant = ["qdrant-client>=1.7"]
+redis = ["redis>=5.0"]
+mongo = ["pymongo>=4.6", "motor>=3.3"]
+elasticsearch = ["elasticsearch>=8.12"]
+cassandra = ["cassandra-driver>=3.29"]
+kafka = ["confluent-kafka>=2.3"]
+grpc = ["grpcio>=1.60", "grpcio-tools>=1.60", "protobuf>=4.25"]
+otel = [
+    "opentelemetry-api>=1.22",
+    "opentelemetry-sdk>=1.22",
+    "opentelemetry-exporter-prometheus>=0.44b0",
+]
+all = [
+    "muxdb[psycopg]",
+    "muxdb[asyncpg]",
+    "muxdb[sqlalchemy]",
+    "muxdb[django]",
+    "muxdb[sqlmodel]",
+    "muxdb[qdrant]",
+    "muxdb[redis]",
+    "muxdb[mongo]",
+    "muxdb[elasticsearch]",
+    "muxdb[cassandra]",
+    "muxdb[kafka]",
+    "muxdb[grpc]",
+    "muxdb[otel]",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.1",
+    "mypy>=1.8",
+    "ruff>=0.2",
+    "hypothesis>=6.98",
+]
+
+[project.urls]
+Homepage = "https://github.com/gshuvam/MuxDB"
+Documentation = "https://github.com/gshuvam/MuxDB#readme"
+Repository = "https://github.com/gshuvam/MuxDB"
+Issues = "https://github.com/gshuvam/MuxDB/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["muxdb"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
