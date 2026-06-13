@@ -59,6 +59,42 @@ class TestPythonIntegrations(unittest.TestCase):
         self.assertEqual(extract_routing_key("{user_123}:profile"), "user_123")
         self.assertEqual(extract_routing_key("profile:{user_123}:details"), "user_123")
 
+    def test_mongodb_routing(self) -> None:
+        from muxdb.integrations.mongodb import MuxMongoClient
+        mock_clients = {"s0": MagicMock(), "s1": MagicMock()}
+        client = MuxMongoClient(self.db, mock_clients)
+        
+        # Test collection item access
+        db_wrapper = client["my_db"]
+        col = db_wrapper["my_collection"]
+        self.assertEqual(col.name, "my_collection")
+
+    def test_qdrant_routing(self) -> None:
+        from muxdb.integrations.qdrant import MuxQdrantClient
+        mock_clients = {"s0": MagicMock(), "s1": MagicMock()}
+        client = MuxQdrantClient(self.db, mock_clients)
+        
+        # Test routing resolution
+        shard_id = client._resolve_shard("point-123", {"user_id": 42})
+        expected = self.db.router.route_key(42).id
+        self.assertEqual(shard_id, expected)
+
+    def test_elasticsearch_routing(self) -> None:
+        from muxdb.integrations.elasticsearch import MuxElasticsearch
+        mock_clients = {"s0": MagicMock(), "s1": MagicMock()}
+        client = MuxElasticsearch(self.db, mock_clients)
+        
+        # Test resolve shard
+        shard_id = client._resolve_shard(None, {"user_id": 100})
+        expected = self.db.router.route_key(100).id
+        self.assertEqual(shard_id, expected)
+
+    def test_cassandra_routing(self) -> None:
+        from muxdb.integrations.cassandra import MuxCassandraSession
+        mock_sessions = {"s0": MagicMock(), "s1": MagicMock()}
+        session = MuxCassandraSession(self.db, mock_sessions)
+        self.assertIsNotNone(session)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,10 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { MuxDB } from "../src/client.js";
-import { MuxConfig } from "../src/config.js";
-import { createMuxPrisma } from "../src/integrations/prisma.js";
-import { createMuxDrizzle } from "../src/integrations/drizzle.js";
-import { createMuxKnex } from "../src/integrations/knex.js";
-import { ShardKey, getShardKeyProperty } from "../src/integrations/typeorm.js";
+import {
+  MuxDB,
+  MuxConfig,
+  createMuxPrisma,
+  createMuxDrizzle,
+  createMuxKnex,
+  ShardKey,
+  getShardKeyProperty,
+  MuxSequelize,
+  MuxMikroORM,
+  MuxMongooseConnection,
+  MuxIORedis,
+  MuxKyselyDialect,
+} from "../src/index.js";
+import { extractRoutingKey } from "../src/integrations/ioredis.js";
 
 describe("Node.js Integrations Smoke Tests", () => {
   const config = new MuxConfig({
@@ -75,5 +84,36 @@ describe("Node.js Integrations Smoke Tests", () => {
     }
     const prop = getShardKeyProperty(User);
     expect(prop).toBe("userId");
+  });
+
+  it("should initialize Sequelize sharded database successfully", () => {
+    const db = new MuxDB(config);
+    const s = new MuxSequelize(db, {});
+    const model = s.define("User", { name: "string" });
+    expect(model).toBeDefined();
+  });
+
+  it("should initialize MikroORM sharded em successfully", () => {
+    const db = new MuxDB(config);
+    const o = new MuxMikroORM(db, {});
+    expect(o.em).toBeDefined();
+  });
+
+  it("should initialize Mongoose connection successfully", () => {
+    const db = new MuxDB(config);
+    const conn = new MuxMongooseConnection(db);
+    expect(conn.model).toBeDefined();
+  });
+
+  it("should resolve ioredis hash tag routing keys", () => {
+    expect(extractRoutingKey("key123")).toBe("key123");
+    expect(extractRoutingKey("{user_123}:profile")).toBe("user_123");
+  });
+
+  it("should create Kysely dialect successfully", () => {
+    const db = new MuxDB(config);
+    const dialect = new MuxKyselyDialect(db);
+    const driver = dialect.createDriver();
+    expect(driver).toBeDefined();
   });
 });

@@ -54,5 +54,10 @@ export {
 // Integrations
 export { createMuxPrisma } from "./integrations/prisma.js";
 export { createMuxDrizzle } from "./integrations/drizzle.js";
-export { MuxDataSource, ShardKey } from "./integrations/typeorm.js";
+export { MuxDataSource, ShardKey, getShardKeyProperty } from "./integrations/typeorm.js";
 export { createMuxKnex } from "./integrations/knex.js";
+export { MuxSequelize } from "./integrations/sequelize.js";
+export { MuxMikroORM } from "./integrations/mikro-orm.js";
+export { MuxConnection as MuxMongooseConnection } from "./integrations/mongoose.js";
+export { MuxIORedis } from "./integrations/ioredis.js";
+export { MuxDialect as MuxKyselyDialect } from "./integrations/kysely.js";
